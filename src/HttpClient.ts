@@ -1,43 +1,54 @@
-import axios, {AxiosInstance, AxiosRequestConfig, AxiosResponse} from 'axios'
+import fetch, { Response } from 'node-fetch';
 
 class HttpClient {
-    private instance: AxiosInstance
+    private baseURL: string;
+    private headers: Record<string, string>;
 
-    constructor(baseURL: string, timeout = 10000) {
-        this.instance = axios.create({
-            baseURL,
-            timeout,
-            headers: {'Content-Type': 'application/json'},
-        })
-
-        this.instance.interceptors.request.use(
-            (config) => {
-                return config
-            },
-            (error) => Promise.reject(error)
-        )
-
-        this.instance.interceptors.response.use(
-            (response: AxiosResponse) => response.data,
-            (error) => Promise.reject(error)
-        )
+    constructor(baseURL: string) {
+        this.baseURL = baseURL;
+        this.headers = {
+            'Content-Type': 'application/json',
+        };
     }
 
-    get<T = any>(url: string, params?: any, config?: AxiosRequestConfig): Promise<T> {
-        return this.instance.get(url, {params, ...config})
+    private async request<T>(method: string, url: string, data?: any): Promise<T> {
+
+        const options: any = {
+            method,
+            headers: this.headers,
+        };
+
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+
+        const response: Response = await fetch(`${this.baseURL}${url}`, options);
+        return this.handleResponse<T>(response);
     }
 
-    post<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        return this.instance.post(url, data, config)
+    private async handleResponse<T>(response: Response): Promise<T> {
+        if (!response.ok) {
+            throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+        }
+        return response.json() as Promise<T>;
     }
 
-    put<T = any>(url: string, data?: any, config?: AxiosRequestConfig): Promise<T> {
-        return this.instance.put(url, data, config)
+    async get<T>(url: string): Promise<T> {
+        return this.request<T>('GET', url);
     }
 
-    delete<T = any>(url: string, config?: AxiosRequestConfig): Promise<T> {
-        return this.instance.delete(url, config)
+    async post<T>(url: string, data: any): Promise<T> {
+        return this.request<T>('POST', url, data);
     }
+
+    async put<T>(url: string, data: any): Promise<T> {
+        return this.request<T>('PUT', url, data);
+    }
+
+    async delete<T>(url: string): Promise<T> {
+        return this.request<T>('DELETE', url);
+    }
+
 }
 
-export default HttpClient
+export default HttpClient;

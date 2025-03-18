@@ -209,13 +209,13 @@ class chainTransaction {
             upper_bound: sha256,
             json: true,
         }
-        const {rows} = await this.apiClient.post('/v1/chain/get_table_rows', params)
+        const {rows}:any = await this.apiClient.post('/v1/chain/get_table_rows', params)
         return rows[0] || null
     }
 
     static async bindAccount(params: any): Promise<string> {
         const {body} = params
-        const response = await this.proxyClient.post(`/api/submit/bind${body.base_chain}`, params)
+        const response:any = await this.proxyClient.post(`/api/submit/bind${body.base_chain}`, params)
         return response.code === 200 ? 'success' : 'error'
     }
 
