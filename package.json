@@ -1,6 +1,6 @@
 {
     "name": "chain-transaction",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A simple Web3 wallet connector supporting Ethereum, Solana, Tron, and Avalanche.",
     "main": "./lib/index.js",
     "types": "./lib/index.d.ts",
