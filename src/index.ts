@@ -1,2 +1,1 @@
-
-export * from './chainTransaction'
+export {default as chainTransaction} from './chainTransaction'
